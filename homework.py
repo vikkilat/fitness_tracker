@@ -1,30 +1,34 @@
+from dataclasses import dataclass
+from typing import ClassVar
+
+
+@dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
-
-    def __init__(self,
-                 training_type: str,
-                 duration: float,
-                 distance: float,
-                 speed: float,
-                 calories: float) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
+    MESSAGE: ClassVar[str] = ('Тип тренировки: {training_type}; '
+                              'Длительность: {duration:.3f} ч.; '
+                              'Дистанция: {distance:.3f} км; '
+                              'Ср. скорость: {speed:.3f} км/ч; '
+                              'Потрачено ккал: {calories:.3f}.')
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
 
     def get_message(self) -> str:
-        return (f'Тип тренировки: {self.training_type}; '
-                f'Длительность: {self.duration:.3f} ч.; '
-                f'Дистанция: {self.distance:.3f} км; '
-                f'Ср. скорость: {self.speed:.3f} км/ч; '
-                f'Потрачено ккал: {self.calories:.3f}.')
+        return (self.MESSAGE.format(training_type=self.training_type,
+                                    duration=self.duration,
+                                    distance=self.distance,
+                                    speed=self.speed,
+                                    calories=self.calories))
 
 
 class Training:
     """Базовый класс тренировки."""
-    LEN_STEP = 0.65
-    M_IN_KM = 1000
+    LEN_STEP: float = 0.65
+    M_IN_KM: int = 1000
+    MIN: int = 60
 
     def __init__(self,
                  action: int,
@@ -61,21 +65,21 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
-    K_1 = 18
-    K_2 = 20
+    K_1: int = 18
+    K_2: int = 20
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
         spent_calories = ((self.K_1 * self.get_mean_speed()
                           - self.K_2) * self.weight
-                          / self.M_IN_KM * self.duration * 60)
+                          / self.M_IN_KM * self.duration * self.MIN)
         return spent_calories
 
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
-    K_3 = 0.035
-    K_4 = 0.029
+    K_3: float = 0.035
+    K_4: float = 0.029
 
     def __init__(self,
                  action: int,
@@ -90,15 +94,15 @@ class SportsWalking(Training):
         spent_calories = ((self.K_3 * self.weight
                           + (self.get_mean_speed() ** 2
                            // self.height) * self.K_4
-                           * self.weight) * self.duration * 60)
+                           * self.weight) * self.duration * self.MIN)
         return spent_calories
 
 
 class Swimming(Training):
     """Тренировка: плавание."""
-    LEN_STEP = 1.38
-    K_5 = 1.1
-    K_6 = 2
+    LEN_STEP: float = 1.38
+    K_5: float = 1.1
+    K_6: float = 2
 
     def __init__(self, action: int,
                  duration: float,
@@ -127,8 +131,6 @@ def read_package(workout_type: str, data: list) -> Training:
     sport = {'SWM': Swimming,
              'RUN': Running,
              'WLK': SportsWalking}
-    if workout_type not in sport:
-        raise ValueError('Ошибка: такого ключа нет')
     return sport[workout_type](*data)
 
 
