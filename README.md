@@ -48,3 +48,6 @@ pip install -r requirements.txt
 ```
 python homework.py
 ```
+
+## Автор:
+[Латышева Виктория](https://github.com/vikkilat)
